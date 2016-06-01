@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import butterknife.ButterKnife;
 
@@ -17,7 +18,8 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     ButterKnife.bind(this);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+    Toolbar toolbar = ButterKnife.findById(this, R.id.toolbar);
     setSupportActionBar(toolbar);
 
     FloatingActionButton fab = ButterKnife.findById(this, R.id.fab);
@@ -41,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
     int id = item.getItemId();
 
     //noinspection SimplifiableIfStatement
-    if (id == R.id.action_settings) {
+    if (id == R.id.action_parent_mode) {
+      Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT).show();
       return true;
     }
 
