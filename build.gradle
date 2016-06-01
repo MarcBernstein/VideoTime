@@ -8,9 +8,10 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0-alpha2'
         classpath 'com.github.JakeWharton:sdk-manager-plugin:e05218601b1274ea0721e13b33a426f641156f69'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.9'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta4'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -21,6 +22,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://jitpack.io' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 }
 
