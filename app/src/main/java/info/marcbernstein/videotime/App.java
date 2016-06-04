@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.squareup.leakcanary.LeakCanary;
 
+import org.greenrobot.eventbus.EventBus;
+
 import dagger.ObjectGraph;
 import info.marcbernstein.videotime.di.modules.VideoTimeModule;
 
@@ -30,6 +32,10 @@ public class App extends Application {
 
   private void initLibs() {
     LeakCanary.install(this);
+    EventBus.builder()
+        .sendNoSubscriberEvent(false)
+        .throwSubscriberException(true)
+        .installDefaultEventBus();
   }
 
   //region Dependency Injection

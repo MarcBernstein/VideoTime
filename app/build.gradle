@@ -75,6 +75,15 @@ dependencies {
     compile "com.google.android.gms:play-services-base:$playServicesVersion"
     compile "com.google.android.gms:play-services-gcm:$playServicesVersion"
 
+    // Firebase
+    def firebaseVersion = '9.0.1'
+    compile "com.google.firebase:firebase-core:$firebaseVersion"
+    compile "com.google.firebase:firebase-database:$firebaseVersion"
+    compile "com.google.firebase:firebase-storage:$firebaseVersion"
+    compile "com.google.firebase:firebase-crash:$firebaseVersion"
+    compile "com.google.firebase:firebase-messaging:$firebaseVersion"
+    compile "com.google.firebase:firebase-config:$firebaseVersion"
+
     // Deps
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
     compile 'net.sourceforge.streamsupport:streamsupport:1.4.3'
@@ -111,3 +120,5 @@ dependencies {
     // Redefine indirect dependencies for test compile configs due to https://goo.gl/J6Bo4o
     testCompile "com.android.support:support-v4:$supportLibraryVersion"
 }
+
+apply plugin: 'com.google.gms.google-services'
