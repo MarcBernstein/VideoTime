@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "473160464009",
+    "firebase_url": "https://video-time-7cc96.firebaseio.com",
+    "project_id": "video-time-7cc96",
+    "storage_bucket": "video-time-7cc96.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473160464009:android:d756df08838cae13",
+        "android_client_info": {
+          "package_name": "info.marcbernstein.videotime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "473160464009-s0hj9k7182j3kebdjfcdliejbk385851.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "info.marcbernstein.videotime",
+            "certificate_hash": "D2B43CA0825A4B6E3C8A72AC0734AE8F635B8C9C"
+          }
+        },
+        {
+          "client_id": "473160464009-7fkon73a06tkaata1qe71pd1ns8gedi4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUYUKT2ekXUb5mHJoknJv1p4Uv9dxLUSU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "473160464009-7fkon73a06tkaata1qe71pd1ns8gedi4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

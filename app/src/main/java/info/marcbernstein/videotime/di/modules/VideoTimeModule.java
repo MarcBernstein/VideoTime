@@ -1,22 +1,31 @@
 package info.marcbernstein.videotime.di.modules;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import info.marcbernstein.videotime.App;
-import info.marcbernstein.videotime.MainActivityFragment;
+import info.marcbernstein.videotime.MainActivity;
+import info.marcbernstein.videotime.VideoTimeFirebaseMessagingService;
 
 @Module(
     injects = {
-        MainActivityFragment.class,
+        MainActivity.class,
+        VideoTimeFirebaseMessagingService.class,
     }
 )
 public class VideoTimeModule {
 
+//  @Provides
+//  @Singleton
+//  public App providesApplication() {
+//    return App.getInstance();
+//  }
+
   @Provides
   @Singleton
-  public App providesApplication() {
-    return App.getInstance();
+  public FirebaseDatabase providesFirebaseDatabase() {
+    return FirebaseDatabase.getInstance();
   }
 }
