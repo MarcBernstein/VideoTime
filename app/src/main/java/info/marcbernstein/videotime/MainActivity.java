@@ -29,6 +29,9 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import info.marcbernstein.videotime.realm.Minutes;
+import info.marcbernstein.videotime.realm.TimeToUse;
+import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
   private static final String TAG = MainActivity.class.getSimpleName();
   private static final String TIME_TO_USE = "time_to_use";
   private static final String MINUTES_TOTAL = "minutes_total";
+  private static final long DEFAULT_TIME_TO_USE = 15L;
 
   private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
   private Long mTimeToUse;
 
-  private ValueEventListener mMinutesTotalListener = new ValueEventListener() {
+  private final ValueEventListener mMinutesTotalListener = new ValueEventListener() {
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
       mMinutesVal = dataSnapshot.getValue(Long.class);
@@ -69,13 +73,19 @@ public class MainActivity extends AppCompatActivity {
         mMinutesVal = 0L;
       }
 
-      getSharedPrefs().edit()
-          .putLong(MINUTES_TOTAL, mMinutesVal)
-          .apply();
+      executeRealmTransaction(this::updateMinutes);
 
       if (mTextViewMinutes != null) {
         mTextViewMinutes.setText(String.valueOf(mMinutesVal));
       }
+    }
+
+    private void updateMinutes(Realm realm) {
+      Minutes minutes = realm.where(Minutes.class).findFirst();
+      if (minutes == null) {
+        minutes = realm.createObject(Minutes.class);
+      }
+      minutes.minutes = mMinutesVal;
     }
 
     @Override
@@ -85,19 +95,36 @@ public class MainActivity extends AppCompatActivity {
     }
   };
 
-  private ValueEventListener mTimeToUseValueEventListener = new ValueEventListener() {
+  private void executeRealmTransaction(Realm.Transaction transaction) {
+    Realm realm = null;
+    try {
+      realm = Realm.getDefaultInstance();
+      realm.executeTransaction(transaction);
+    } finally {
+      if (realm != null) {
+        realm.close();
+      }
+    }
+  }
+
+  private final ValueEventListener mTimeToUseValueEventListener = new ValueEventListener() {
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
       mTimeToUse = dataSnapshot.getValue(Long.class);
       if (mRefTimeToUse == null) {
-        mTimeToUse = 15L;
+        mTimeToUse = DEFAULT_TIME_TO_USE;
       }
 
-      getSharedPrefs().edit()
-          .putLong(TIME_TO_USE, mTimeToUse)
-          .apply();
-
+      executeRealmTransaction(this::updateTimeToUse);
       Log.d(TAG, "Time To Use update: " + mTimeToUse);
+    }
+
+    private void updateTimeToUse(Realm realm) {
+      TimeToUse timeToUse = realm.where(TimeToUse.class).findFirst();
+      if (timeToUse == null) {
+        timeToUse = realm.createObject(TimeToUse.class);
+      }
+      timeToUse.timeToUse = mTimeToUse;
     }
 
     @Override
@@ -105,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
       FirebaseCrash.report(databaseError.toException());
     }
   };
+  private Realm mRealm;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
     ButterKnife.bind(this);
     App.inject(this);
+
+    mRealm = Realm.getDefaultInstance();
 
     String userId = getSharedPrefs().getString("USER_ID", USER_ID_KID);
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -122,10 +152,14 @@ public class MainActivity extends AppCompatActivity {
 
     setSupportActionBar(mToolbar);
 
-    mTimeToUse = getSharedPrefs().getLong(TIME_TO_USE, 15);
+    //mTimeToUse = getSharedPrefs().getLong(TIME_TO_USE, 15);
+    TimeToUse timeToUse = mRealm.where(TimeToUse.class).findFirst();
+    mTimeToUse = timeToUse != null ? timeToUse.timeToUse : DEFAULT_TIME_TO_USE;
 
-    Long minutes = getSharedPrefs().getLong(MINUTES_TOTAL, 0L);
-    mTextViewMinutes.setText(String.valueOf(minutes));
+    //Long minutes = getSharedPrefs().getLong(MINUTES_TOTAL, 0L);
+    Minutes minutes = mRealm.where(Minutes.class).findFirst();
+    Long minutesVal = minutes != null ? minutes.minutes : 0L;
+    mTextViewMinutes.setText(String.valueOf(minutesVal));
 
     mFab.setOnClickListener(this::fabClick);
   }
@@ -219,5 +253,11 @@ public class MainActivity extends AppCompatActivity {
 
     mRefTimeToUse.removeEventListener(mTimeToUseValueEventListener);
     mRefMinutesTotal = null;
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mRealm.close();
   }
 }

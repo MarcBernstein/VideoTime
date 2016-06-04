@@ -87,6 +87,11 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
     PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
         PendingIntent.FLAG_UPDATE_CURRENT);
 
+    NotificationCompat.BigPictureStyle style = new
+        NotificationCompat.BigPictureStyle();
+    style.setBigContentTitle(getString(R.string.new_message));
+    style.setSummaryText(msg);
+
     Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
         .setSmallIcon(R.drawable.ic_plus_box_white_48dp)
@@ -94,6 +99,8 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
         .setContentText(msg)
         .setAutoCancel(true)
         .setSound(defaultSoundUri)
+        .setStyle(new NotificationCompat.BigTextStyle()
+            .bigText(msg))
         .setContentIntent(pendingIntent);
 
     NotificationManager notificationManager =

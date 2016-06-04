@@ -4,7 +4,7 @@
     <string name="use_time">Use Time</string>
     <string name="minutes">minutes</string>
     <string name="you_have">Emma, you have…</string>
-    <string name="new_message">New Message!</string>
+    <string name="new_message">Video Time Message!</string>
     <string name="used_minutes">%d minutes used.</string>
     <string name="no_minutes">You have no minutes to use.</string>
     <string name="no_minutes_action_msg">Okay :(</string>

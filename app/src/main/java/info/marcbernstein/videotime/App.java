@@ -8,6 +8,8 @@ import org.greenrobot.eventbus.EventBus;
 
 import dagger.ObjectGraph;
 import info.marcbernstein.videotime.di.modules.VideoTimeModule;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class App extends Application {
 
@@ -32,10 +34,14 @@ public class App extends Application {
 
   private void initLibs() {
     LeakCanary.install(this);
+
     EventBus.builder()
         .sendNoSubscriberEvent(false)
         .throwSubscriberException(true)
         .installDefaultEventBus();
+
+    RealmConfiguration config = new RealmConfiguration.Builder(this).build();
+    Realm.setDefaultConfiguration(config);
   }
 
   //region Dependency Injection
