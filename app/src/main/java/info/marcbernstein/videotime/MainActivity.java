@@ -158,8 +158,9 @@ public class MainActivity extends AppCompatActivity {
 
     //Long minutes = getSharedPrefs().getLong(MINUTES_TOTAL, 0L);
     Minutes minutes = mRealm.where(Minutes.class).findFirst();
-    Long minutesVal = minutes != null ? minutes.minutes : 0L;
-    mTextViewMinutes.setText(String.valueOf(minutesVal));
+    mMinutesVal = minutes != null ? minutes.minutes : 0L;
+    mFirebaseDatabase.getReference(MINUTES_TOTAL).setValue(mMinutesVal);
+    mTextViewMinutes.setText(String.valueOf(mMinutesVal));
 
     mFab.setOnClickListener(this::fabClick);
   }
