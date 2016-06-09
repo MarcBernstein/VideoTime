@@ -23,6 +23,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -41,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
   private static final String TIME_TO_USE = "time_to_use";
   private static final String MINUTES_TOTAL = "minutes_total";
   private static final long DEFAULT_TIME_TO_USE = 15L;
+
+  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("hh:mma MMM d", Locale.US);
 
   private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -195,6 +200,11 @@ public class MainActivity extends AppCompatActivity {
     if (view != null) {
       Snackbar.make(view, getString(R.string.used_minutes, mTimeToUse), Snackbar.LENGTH_LONG)
           .setAction("UNDO", v -> undoTimeUse(processing)).show();
+
+      // Log the timestamp to DB
+      String timestamp = DATE_FORMAT.format(new Date());
+      String msg = String.format(Locale.US, "%sm -> %sm", mMinutesVal, mMinutesVal - mTimeToUse);
+      mFirebaseDatabase.getReference("timestamps").child(timestamp).setValue(msg);
 
       mMinutesVal -= mTimeToUse;
       mMinutesVal = Math.max(mMinutesVal, 0);
