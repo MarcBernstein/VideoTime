@@ -1,4 +1,4 @@
-package info.marcbernstein.videotime;
+package info.marcbernstein.videotime.services;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -24,8 +24,14 @@ import java.util.Random;
 
 import javax.inject.Inject;
 
+import info.marcbernstein.videotime.App;
+import info.marcbernstein.videotime.MainActivity;
+import info.marcbernstein.videotime.R;
+import info.marcbernstein.videotime.utils.DateUtils;
+
 public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService {
   private static final String TAG = VideoTimeFirebaseMessagingService.class.getSimpleName();
+  public static final String TIMESTAMPS_RECEIVED = "timestamps_received";
 
   @Inject
   FirebaseDatabase mFirebaseDatabase;
@@ -54,11 +60,12 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
    */
   private void sendNotification(Map<String, String> data) {
     final Integer minutes = Integer.valueOf(data.get("minutes"));
-    String reason = data.get("reason");
-    String from = data.get("from_who");
-    if (!(reason.endsWith(".") || reason.endsWith("!") || reason.endsWith("..."))) {
-      reason += '.';
+    String reasonData = data.get("reason");
+    final String from = data.get("from_who");
+    if (!(reasonData.endsWith(".") || reasonData.endsWith("!") || reasonData.endsWith("..."))) {
+      reasonData += '.';
     }
+    final String reason = reasonData;
 
     String msg = String.format(Locale.US, "You got %d minutes from %s for %s", minutes, from, reason);
 
@@ -70,6 +77,11 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
         if (currentValue == null) {
           currentValue = 0;
         }
+
+        // Log the timestamp to DB
+        String receivedMsg = String.format(Locale.US, "%sm -> %sm, Msg: %d, %s, %s", currentValue, currentValue + minutes, minutes, reason, from);
+        mFirebaseDatabase.getReference(TIMESTAMPS_RECEIVED).child(DateUtils.getTimestamp()).setValue(receivedMsg);
+
         currentValue += minutes;
 
         ref.setValue(currentValue);

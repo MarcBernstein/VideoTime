@@ -21,14 +21,14 @@
         </activity>
 
         <service
-            android:name=".VideoTimeFirebaseMessagingService">
+            android:name=".services.VideoTimeFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
         <service
-            android:name=".VideoTimeFirebaseInstanceIDService">
+            android:name=".services.VideoTimeFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>

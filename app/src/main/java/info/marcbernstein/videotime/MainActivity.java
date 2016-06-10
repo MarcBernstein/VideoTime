@@ -2,6 +2,7 @@ package info.marcbernstein.videotime;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +25,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +34,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.marcbernstein.videotime.realm.Minutes;
 import info.marcbernstein.videotime.realm.TimeToUse;
+import info.marcbernstein.videotime.utils.DateUtils;
 import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
   private static final String TIME_TO_USE = "time_to_use";
   private static final String MINUTES_TOTAL = "minutes_total";
   private static final long DEFAULT_TIME_TO_USE = 15L;
-
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("hh:mm:ss:SS a MMM d", Locale.US);
+  public static final String TIMESTAMPS_USED = "timestamps";
 
   private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -202,9 +202,8 @@ public class MainActivity extends AppCompatActivity {
           .setAction("UNDO", v -> undoTimeUse(processing)).show();
 
       // Log the timestamp to DB
-      String timestamp = DATE_FORMAT.format(new Date());
-      String msg = String.format(Locale.US, "%sm -> %sm", mMinutesVal, mMinutesVal - mTimeToUse);
-      mFirebaseDatabase.getReference("timestamps").child(timestamp).setValue(msg);
+      String msg = String.format(Locale.US, "Used: %sm -> %sm", mMinutesVal, mMinutesVal - mTimeToUse);
+      mFirebaseDatabase.getReference(TIMESTAMPS_USED).child(DateUtils.getTimestamp()).setValue(msg);
 
       mMinutesVal -= mTimeToUse;
       mMinutesVal = Math.max(mMinutesVal, 0);
@@ -218,9 +217,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Log the timestamp to DB
-    String timestamp = DATE_FORMAT.format(new Date());
     String msg = String.format(Locale.US, "Undo: %sm -> %sm", mMinutesVal, mMinutesVal + mTimeToUse);
-    mFirebaseDatabase.getReference("timestamps").child(timestamp).setValue(msg);
+    mFirebaseDatabase.getReference(TIMESTAMPS_USED).child(DateUtils.getTimestamp()).setValue(msg);
 
     processing.compareAndSet(false, true);
     mMinutesVal += mTimeToUse;
@@ -259,6 +257,16 @@ public class MainActivity extends AppCompatActivity {
 
     mRefTimeToUse = mFirebaseDatabase.getReference(TIME_TO_USE);
     mRefTimeToUse.addValueEventListener(mTimeToUseValueEventListener);
+
+    if (BuildConfig.DEBUG) {
+      if (Debug.isDebuggerConnected()) {
+        Log.d("SCREEN", "Keeping screen on for debugging, detach debugger and force an onResume to turn it off.");
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+      } else {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        Log.d("SCREEN", "Keeping screen on for debugging is now deactivated.");
+      }
+    }
   }
 
   @Override

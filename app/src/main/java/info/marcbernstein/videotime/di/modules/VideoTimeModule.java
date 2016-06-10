@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import info.marcbernstein.videotime.MainActivity;
-import info.marcbernstein.videotime.VideoTimeFirebaseMessagingService;
+import info.marcbernstein.videotime.services.VideoTimeFirebaseMessagingService;
 
 @Module(
     injects = {

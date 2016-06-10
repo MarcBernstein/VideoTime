@@ -1,4 +1,4 @@
-package info.marcbernstein.videotime;
+package info.marcbernstein.videotime.services;
 
 import android.util.Log;
 
