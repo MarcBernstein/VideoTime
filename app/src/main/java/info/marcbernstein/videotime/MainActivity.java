@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
   private static final String MINUTES_TOTAL = "minutes_total";
   private static final long DEFAULT_TIME_TO_USE = 15L;
 
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("hh:mma MMM d", Locale.US);
+  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("hh:mm:ss:SS a MMM d", Locale.US);
 
   private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -216,6 +216,12 @@ public class MainActivity extends AppCompatActivity {
     if (processing.get()) {
       return;
     }
+
+    // Log the timestamp to DB
+    String timestamp = DATE_FORMAT.format(new Date());
+    String msg = String.format(Locale.US, "Undo: %sm -> %sm", mMinutesVal, mMinutesVal + mTimeToUse);
+    mFirebaseDatabase.getReference("timestamps").child(timestamp).setValue(msg);
+
     processing.compareAndSet(false, true);
     mMinutesVal += mTimeToUse;
     mRefMinutesTotal.setValue(mMinutesVal);
