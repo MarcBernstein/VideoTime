@@ -29,30 +29,19 @@ import info.marcbernstein.videotime.MainActivity;
 import info.marcbernstein.videotime.R;
 import info.marcbernstein.videotime.utils.DateUtils;
 
+import static info.marcbernstein.videotime.MainActivity.MINUTES_TOTAL;
+
 public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService {
   private static final String TAG = VideoTimeFirebaseMessagingService.class.getSimpleName();
-  public static final String TIMESTAMPS_RECEIVED = "timestamps_received";
+  private static final String TIMESTAMPS_RECEIVED = "timestamps_received";
 
   @Inject
   FirebaseDatabase mFirebaseDatabase;
-  private DatabaseReference mMinutesTotalRef;
-  private DatabaseReference mReceivedRef;
 
   @Override
   public void onCreate() {
     super.onCreate();
     App.inject(this);
-
-    mMinutesTotalRef = mFirebaseDatabase.getReference("minutes_total");
-    mReceivedRef = mFirebaseDatabase.getReference(TIMESTAMPS_RECEIVED);
-  }
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-
-    mMinutesTotalRef = null;
-    mReceivedRef = null;
   }
 
   @Override
@@ -82,21 +71,21 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
 
     String msg = String.format(Locale.US, "You got %d minutes from %s for %s", minutes, from, reason);
 
-    mMinutesTotalRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    final DatabaseReference ref = mFirebaseDatabase.getReference(MINUTES_TOTAL);
+    ref.addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         Integer currentValue = dataSnapshot.getValue(Integer.class);
         if (currentValue == null) {
           currentValue = 0;
         }
-
         currentValue += minutes;
 
-        mMinutesTotalRef.setValue(currentValue);
+        ref.setValue(currentValue);
 
         // Log the timestamp to DB
         String receivedMsg = String.format(Locale.US, "%sm -> %sm, Msg: %d, %s, %s", currentValue - minutes, currentValue, minutes, reason, from);
-        mReceivedRef.child(DateUtils.getTimestamp()).setValue(receivedMsg);
+        mFirebaseDatabase.getReference(TIMESTAMPS_RECEIVED).child(DateUtils.getTimestamp()).setValue(receivedMsg);
       }
 
       @Override

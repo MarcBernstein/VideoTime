@@ -43,9 +43,9 @@ public class MainActivity extends AppCompatActivity {
   private static final String USER_ID_PARENT = "100";
   private static final String TAG = MainActivity.class.getSimpleName();
   private static final String TIME_TO_USE = "time_to_use";
-  private static final String MINUTES_TOTAL = "minutes_total";
+  public static final String MINUTES_TOTAL = "minutes_total";
   private static final long DEFAULT_TIME_TO_USE = 15L;
-  public static final String TIMESTAMPS_USED = "timestamps";
+  private static final String TIMESTAMPS_USED = "timestamps";
 
   private FirebaseAnalytics mFirebaseAnalytics;
 
