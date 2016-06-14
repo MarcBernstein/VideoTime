@@ -35,11 +35,24 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
 
   @Inject
   FirebaseDatabase mFirebaseDatabase;
+  private DatabaseReference mMinutesTotalRef;
+  private DatabaseReference mReceivedRef;
 
   @Override
   public void onCreate() {
     super.onCreate();
     App.inject(this);
+
+    mMinutesTotalRef = mFirebaseDatabase.getReference("minutes_total");
+    mReceivedRef = mFirebaseDatabase.getReference(TIMESTAMPS_RECEIVED);
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+
+    mMinutesTotalRef = null;
+    mReceivedRef = null;
   }
 
   @Override
@@ -58,7 +71,7 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
   /**
    * Create and show a simple notification containing the received FCM message.
    */
-  private void sendNotification(Map<String, String> data) {
+  private synchronized void sendNotification(Map<String, String> data) {
     final Integer minutes = Integer.valueOf(data.get("minutes"));
     String reasonData = data.get("reason");
     final String from = data.get("from_who");
@@ -69,8 +82,7 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
 
     String msg = String.format(Locale.US, "You got %d minutes from %s for %s", minutes, from, reason);
 
-    final DatabaseReference ref = mFirebaseDatabase.getReference("minutes_total");
-    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+    mMinutesTotalRef.addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         Integer currentValue = dataSnapshot.getValue(Integer.class);
@@ -78,13 +90,13 @@ public class VideoTimeFirebaseMessagingService extends FirebaseMessagingService 
           currentValue = 0;
         }
 
-        // Log the timestamp to DB
-        String receivedMsg = String.format(Locale.US, "%sm -> %sm, Msg: %d, %s, %s", currentValue, currentValue + minutes, minutes, reason, from);
-        mFirebaseDatabase.getReference(TIMESTAMPS_RECEIVED).child(DateUtils.getTimestamp()).setValue(receivedMsg);
-
         currentValue += minutes;
 
-        ref.setValue(currentValue);
+        mMinutesTotalRef.setValue(currentValue);
+
+        // Log the timestamp to DB
+        String receivedMsg = String.format(Locale.US, "%sm -> %sm, Msg: %d, %s, %s", currentValue - minutes, currentValue, minutes, reason, from);
+        mReceivedRef.child(DateUtils.getTimestamp()).setValue(receivedMsg);
       }
 
       @Override
